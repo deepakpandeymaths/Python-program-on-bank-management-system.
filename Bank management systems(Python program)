@@ -1,0 +1,235 @@
+import pickle
+import time
+import os
+print ("\n")
+print ("="*90)
+print ("="*90)
+print ("                           Welcome In Banking Accounting System")
+cust={}
+while True:
+    print ("="*90)
+    print ("\n")
+    print ("1. Customer Account Creation")
+    print ("2. Show All Account Details")
+    print ("3. Deposit Amount In Account")
+    print ("4. Withdraw Amount From Account")
+    print ("5. Details Of Specific Account")
+    print ("6. Remove Account")
+    print ("7. Modify Account")
+    print ("0. Exit","\n")
+    print ("-"*90)
+    choice=int(input("Enter Your Choice : "))
+    print ("-"*90,"\n")
+    print ("="*90)
+
+    if choice==1:
+        actno=int(input("Enter the Account No. : "))
+        fin=open("bank.txt","rb")
+        x=[]
+        try:
+            while True:
+                cust1=pickle.load(fin)
+                x.append(cust1["actno"])
+        except:
+            fin.close()
+
+        if actno in x:
+            print ("Account Already Exist")
+        else:
+            name=str(input("Enter Customer Name : "))
+            father=str(input("Enter Father Name : "))
+            atype=str(input("Enter the Account Type : "))
+            balance=int(input("Enter the Opening Amount : "))
+            fout=open("bank.txt","ab")
+            cust={"actno":actno,"name":name,"father":father,"atype":atype,"balance":balance}
+            pickle.dump(cust,fout)
+            fout.close()
+            print ("-"*90)
+            print ("Account Entered")
+
+    elif choice==2:
+        fin=open("bank.txt","rb")
+        try:
+            print("ActNo\t\tCustomer Name\t\tFather Name\t\tAType\t\tBalance")
+            print("-"*90)
+            while True:
+                cust1=pickle.load(fin)
+                str1=""
+                for i in cust1:
+                  str1=str1+str(cust1[i])+'\t\t'
+                print (str1)
+        except EOFError:
+            fin.close()
+                
+    elif choice==3:
+        x=[]
+        try:
+            while True:
+                cust1=pickle.load(fin)
+                x.append(cust1["actno"])
+        except:
+            fin.close()
+            
+        actno=int(input("Enter the Account No. : "))
+        if actno in x:
+            amount=int(input("Enter the amount to be deposited : "))
+            fin=open("bank.txt","rb")
+            fout=open("temp.txt","wb")
+            try:
+                while True:
+                    cust1=pickle.load(fin)
+                    if cust1["actno"]!=actno:
+                        pickle.dump(cust1,fout)
+                    else:
+                        cust1["balance"]+=amount
+                        pickle.dump(cust1,fout)
+                        print ("Amount Successfully Deposited")
+            except EOFError:
+                fin.close()
+                fout.close()
+            os.remove("bank.txt")
+            os.rename("temp.txt","bank.txt")
+
+        else:
+            print ("Account Doesn't Exist")
+        
+    elif choice==4:
+        x=[]
+        try:
+            while True:
+                cust1=pickle.load(fin)
+                x.append(cust1["actno"])
+        except:
+            fin.close()
+            
+        actno=int(input("Enter the Account No. : "))
+        if actno in x:
+            amount=int(input("Enter the amount to withdraw : "))
+            fin=open("bank.txt","rb")
+            fout=open("temp.txt","wb")
+            try:
+                while True:
+                    cust1=pickle.load(fin)
+                    if cust1["actno"]!=actno:
+                        pickle.dump(cust1,fout)
+                    else:
+                        cust1["balance"]-=amount
+                        pickle.dump(cust1,fout)
+                        print ("Amount Successfully Withdrawn")
+            except:
+                fin.close()
+                fout.close()
+            os.remove("bank.txt")
+            os.rename("temp.txt","bank.txt")
+
+        else:
+            print ("Account Doesn't Exist")
+        
+    elif choice==5:
+        fin=open("bank.txt","rb")
+        flag=True
+        actno=int(input("Enter the Account No. to be searched : "))
+
+print ("-"*90)
+        try:
+            while True:
+                cust1=pickle.load(fin)
+                if cust1["actno"]==actno:
+                    flag=False
+                    str1=""
+                    print("ActNo\t\tCustomer Name\t\tFather Name\t\tAType\t\tBalance")
+                    print ("-"*90)
+                    for i in cust1:
+                        str1=str1+str(cust1[i])+'\t\t'
+                    print (str1)
+            
+        except EOFError:
+            if flag==True:
+                print("Account does not exist")
+            fin.close()
+
+    elif choice==6:
+        actno=int(input("Enter the Account No. to be removed : "))
+        flag=True
+        fin=open("bank.txt","rb")
+        fout=open("temp.txt","wb")
+        try:
+            while True:
+                cust1=pickle.load(fin)
+                if cust1["actno"]!=actno:
+                    pickle.dump(cust1,fout)
+                else:
+                    flag=False
+        except:
+            print ("-"*90)
+            if flag==True:
+                print ("Account does not exist")
+            else:
+                print ("Account Successfully Removed")
+            fin.close()
+            fout.close()
+        os.remove("bank.txt")
+        os.rename("temp.txt","bank.txt")
+        
+    elif choice==7:
+        fin=open("bank.txt","rb")
+        fout=open("temp.txt","wb")
+        modify=str(input("What you want to modify? (actno/name/father/atype) : "))
+        
+        if modify=="actno":
+            name=str(input("Enter the customer name for the account to be modified : "))
+            value=int(input("Enter the new value : "))
+            try:
+                while True:
+                    cust1=pickle.load(fin)
+                    if cust1["name"]!=name:
+                        pickle.dump(cust1,fout)
+                    else:
+                        cust1[modify]=value
+                        pickle.dump(cust1,fout)
+            except:
+                fin.close()
+                fout.close()
+            print ("-"*90)
+            print ("Account Successfully Modified")        
+            os.remove("bank.txt")
+            os.rename("temp.txt","bank.txt")
+    
+        elif modify=="name" or modify=="father" or modify=="atype":
+            actno=int(input("Enter the account no. for the account to be modified : "))
+            value=str(input("Enter the new value : "))
+            try:
+                while True:
+                    cust1=pickle.load(fin)
+                    if cust1["actno"]!=actno:
+                        pickle.dump(cust1,fout)
+                    else:
+                        cust1[modify]=value
+                        pickle.dump(cust1,fout)
+            except:
+                fin.close()
+                fout.close()
+            print ("-"*90)
+            print ("Account Successfully Modified")        
+            os.remove("bank.txt")
+            os.rename("temp.txt","bank.txt")
+
+        else:
+            print ("Enter Valid Choice...")
+                
+
+    elif choice==0:
+        time.sleep(1)
+        print ("                           Interesting Program")
+        print ("="*90)
+        
+        break
+
+    else:
+        print ("Enter Valid Choice...")
+        print ("="*90)
+        
+    print ("="*90)
+    print ("\n")
+    input("Press Enter To Continue...")
+    print ("="*90)
